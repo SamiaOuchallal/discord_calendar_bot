@@ -1,0 +1,24 @@
+{
+    "devoirs": [
+        {
+            "mati\u00e8re": "maths",
+            "date": "2025-10-28",
+            "description": "exercices sur les int\u00e9grales"
+        },
+        {
+            "mati\u00e8re": "python",
+            "date": "2025-10-26",
+            "description": "contr\u00f4le_haddad"
+        },
+        {
+            "mati\u00e8re": "maths2",
+            "date": "30-10-2025",
+            "description": "test"
+        },
+        {
+            "mati\u00e8re": "nouveautest",
+            "date": "30-12-2025",
+            "description": null
+        }
+    ]
+}
