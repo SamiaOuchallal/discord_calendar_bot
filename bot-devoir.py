@@ -46,29 +46,21 @@ async def ajouter(ctx, matière: str, date: str, *, description: str = None):
     await ctx.send(f"📌 Devoir ajouté : **{date_obj.strftime('%d-%m-%Y')}** en **{matière}** – {description}")
 
 @bot.command()
-async def calendrier(ctx):
-    data = charger_devoirs()
-
-    devoirs_valides = []
-    for d in data["devoirs"]:
-        try:
-            # Conversion en datetime pour tri complet
-            d["date_obj"] = datetime.strptime(d["date"], "%d-%m-%Y")
-            devoirs_valides.append(d)
-        except ValueError:
-            continue  # Ignore les dates invalides
-
-    # Tri par date_obj (jour + mois + année)
-    devoirs_triés = sorted(devoirs_valides, key=lambda d: d["date_obj"])
-
-    if not devoirs_triés:
-        await ctx.send("📭 Aucun devoir valide enregistré.")
+async def ajouter(ctx, matière: str, date: str, *, description: str = None):
+    try:
+        date_obj = datetime.strptime(date, "%d-%m-%Y")
+    except ValueError:
+        await ctx.send("❌ Format de date invalide. Utilise JJ-MM-AAAA.")
         return
 
-    msg = "**📅 Voici les prochains devoirs :**\n"
-    for i, d in enumerate(devoirs_triés, start=1):
-        msg += f"{i}. **{d['matière']}** le **{d['date']}** : {d['description']}\n"
+    data = charger_devoirs()
+    data["devoirs"].append({
+        "matière": matière,
+        "date": date_obj.strftime("%Y-%m-%d"),  # format ISO
+        "description": description
+    })
 
-    await ctx.send(msg)
+    sauvegarder_devoirs(data)
+    await ctx.send(f"📌 Devoir ajouté : **{date_obj.strftime('%d-%m-%Y')}** en **{matière}** – {description}")
 
 bot.run(os.getenv("TOKEN"))
