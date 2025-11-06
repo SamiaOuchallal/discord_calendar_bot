@@ -15,9 +15,26 @@ FICHIER = "devoirs.json"
 def charger_devoirs():
     try:
         with open(FICHIER, "r") as f:
-            return json.load(f)
+            data = json.load(f)
     except FileNotFoundError:
         return {"devoirs": []}
+
+    # Migration automatique des anciennes dates
+    modifié = False
+    for d in data["devoirs"]:
+        try:
+            # Si la date est au format JJ-MM-AAAA, on la convertit
+            if "-" in d["date"] and len(d["date"].split("-")[0]) == 2:
+                date_obj = datetime.strptime(d["date"], "%d-%m-%Y")
+                d["date"] = date_obj.strftime("%Y-%m-%d")
+                modifié = True
+        except Exception:
+            continue
+
+    if modifié:
+        sauvegarder_devoirs(data)
+
+    return data
 
 def sauvegarder_devoirs(data):
     with open(FICHIER, "w") as f:
@@ -38,7 +55,7 @@ async def ajouter(ctx, matière: str, date: str, *, description: str = None):
     data = charger_devoirs()
     data["devoirs"].append({
         "matière": matière,
-        "date": date_obj.strftime("%Y-%m-%d"),  # format ISO
+        "date": date_obj.strftime("%Y-%m-%d"),
         "description": description
     })
 
@@ -64,7 +81,6 @@ async def calendrier(ctx):
 
     msg = "**📅 Voici les prochains devoirs :**\n"
     for i, d in enumerate(devoirs_triés, start=1):
-        # Affichage en format JJ-MM-AAAA pour l’utilisateur
         date_affichée = datetime.strptime(d["date"], "%Y-%m-%d").strftime("%d-%m-%Y")
         msg += f"{i}. **{d['matière']}** le **{date_affichée}** : {d['description']}\n"
 
