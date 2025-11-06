@@ -15,26 +15,9 @@ FICHIER = "devoirs.json"
 def charger_devoirs():
     try:
         with open(FICHIER, "r") as f:
-            data = json.load(f)
+            return json.load(f)
     except FileNotFoundError:
         return {"devoirs": []}
-
-    # Migration automatique des anciennes dates
-    modifié = False
-    for d in data["devoirs"]:
-        try:
-            # Si la date est au format JJ-MM-AAAA, on la convertit
-            if "-" in d["date"] and len(d["date"].split("-")[0]) == 2:
-                date_obj = datetime.strptime(d["date"], "%d-%m-%Y")
-                d["date"] = date_obj.strftime("%Y-%m-%d")
-                modifié = True
-        except Exception:
-            continue
-
-    if modifié:
-        sauvegarder_devoirs(data)
-
-    return data
 
 def sauvegarder_devoirs(data):
     with open(FICHIER, "w") as f:
@@ -47,15 +30,16 @@ async def on_ready():
 @bot.command()
 async def ajouter(ctx, matière: str, date: str, *, description: str = None):
     try:
-        date_obj = datetime.strptime(date, "%d-%m-%Y")
+        # Format attendu : YYYY-MM-DD
+        date_obj = datetime.strptime(date, "%Y-%m-%d")
     except ValueError:
-        await ctx.send("❌ Format de date invalide. Utilise JJ-MM-AAAA.")
+        await ctx.send("❌ Format de date invalide. Utilise AAAA-MM-JJ.")
         return
 
     data = charger_devoirs()
     data["devoirs"].append({
         "matière": matière,
-        "date": date_obj.strftime("%Y-%m-%d"),
+        "date": date,  # déjà au bon format
         "description": description
     })
 
