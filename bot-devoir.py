@@ -50,7 +50,7 @@ async def calendrier(ctx):
     data = charger_devoirs()
 
     try:
-        devoirs = sorted(
+        devoirs_triés = sorted(
             data["devoirs"],
             key=lambda d: datetime.strptime(d["date"], "%d-%m-%Y")
         )
@@ -58,12 +58,12 @@ async def calendrier(ctx):
         await ctx.send("❌ Erreur lors du tri des devoirs.")
         return
 
-    if not devoirs:
+    if not devoirs_triés:
         await ctx.send("📭 Aucun devoir enregistré.")
         return
 
     msg = "**📅 Voici les prochains devoirs :**\n"
-    for i, d in enumerate(devoirs, start=1):
+    for i, d in enumerate(devoirs_triés, start=1):
         msg += f"{i}. **{d['matière']}** le **{d['date']}** : {d['description']}\n"
     await ctx.send(msg)
 
