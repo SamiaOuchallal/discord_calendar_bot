@@ -15,9 +15,26 @@ FICHIER = "devoirs.json"
 def charger_devoirs():
     try:
         with open(FICHIER, "r") as f:
-            return json.load(f)
+            data = json.load(f)
     except FileNotFoundError:
         return {"devoirs": []}
+
+    # Migration automatique des anciennes dates
+    modifié = False
+    for d in data["devoirs"]:
+        try:
+            # Si la date est au format JJ-MM-AAAA, on la convertit
+            if "-" in d["date"] and len(d["date"].split("-")[0]) == 2:
+                date_obj = datetime.strptime(d["date"], "%Y-%m-%d")
+                d["date"] = date_obj.strftime("%Y-%m-%d")
+                modifié = True
+        except Exception:
+            continue
+
+    if modifié:
+        sauvegarder_devoirs(data)
+
+    return data
 
 def sauvegarder_devoirs(data):
     with open(FICHIER, "w") as f:
@@ -30,21 +47,20 @@ async def on_ready():
 @bot.command()
 async def ajouter(ctx, matière: str, date: str, *, description: str = None):
     try:
-        # Format attendu : YYYY-MM-DD
         date_obj = datetime.strptime(date, "%Y-%m-%d")
     except ValueError:
-        await ctx.send("❌ Format de date invalide. Utilise AAAA-MM-JJ.")
+        await ctx.send("❌ Format de date invalide. Utilise JJ-MM-AAAA.")
         return
 
     data = charger_devoirs()
     data["devoirs"].append({
         "matière": matière,
-        "date": date,  # déjà au bon format
+        "date": date_obj.strftime("%Y-%m-%d"),
         "description": description
     })
 
     sauvegarder_devoirs(data)
-    await ctx.send(f"📌 Devoir ajouté : **{date_obj.strftime('%d-%m-%Y')}** en **{matière}** – {description}")
+    await ctx.send(f"📌 Devoir ajouté : **{date_obj.strftime('%Y-%m-%d')}** en **{matière}** – {description}")
 
 @bot.command()
 async def calendrier(ctx):
@@ -65,7 +81,7 @@ async def calendrier(ctx):
 
     msg = "**📅 Voici les prochains devoirs :**\n"
     for i, d in enumerate(devoirs_triés, start=1):
-        date_affichée = datetime.strptime(d["date"], "%Y-%m-%d").strftime("%d-%m-%Y")
+        date_affichée = datetime.strptime(d["date"], "%Y-%m-%d")
         msg += f"{i}. **{d['matière']}** le **{date_affichée}** : {d['description']}\n"
 
     await ctx.send(msg)
