@@ -1,24 +1,34 @@
 {
     "devoirs": [
         {
-            "mati\u00e8re": "maths",
-            "date": "2025-10-28",
-            "description": "exercices sur les int\u00e9grales"
+            "mati\u00e8re": "python",
+            "date": "07-11-2025",
+            "description": "Eval : QCM à points négatifs"
         },
         {
             "mati\u00e8re": "python",
-            "date": "2025-10-26",
-            "description": "contr\u00f4le_haddad"
+            "date": "07-11-2025",
+            "description": "Rendre le compte rendu de l’intégralité des TP"
         },
         {
-            "mati\u00e8re": "maths2",
-            "date": "30-10-2025",
-            "description": "test"
+            "mati\u00e8re": "communication(ECUE152)",
+            "date": "16-12-2025",
+            "description": "Examen final"
         },
         {
-            "mati\u00e8re": "nouveautest",
-            "date": "30-12-2025",
-            "description": null
+            "mati\u00e8re": "physique",
+            "date": "17-11-2025",
+            "description": "contrôle_bouabba"
+        },
+        {
+            "mati\u00e8re": "entreprise",
+            "date": "20-11-2025",
+            "description": "QCM"
+        },
+                {
+            "mati\u00e8re": "UML(ECUE113)",
+            "date": "20-11-2025",
+            "description": "Examen final"
         }
     ]
 }
