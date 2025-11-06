@@ -38,7 +38,7 @@ async def ajouter(ctx, matière: str, date: str, *, description: str = None):
     data = charger_devoirs()
     data["devoirs"].append({
         "matière": matière,
-        "date": date_obj.strftime("%d-%m-%Y"),
+        "date": date_obj.strftime("%Y-%m-%d"),  # format ISO
         "description": description
     })
 
@@ -46,21 +46,28 @@ async def ajouter(ctx, matière: str, date: str, *, description: str = None):
     await ctx.send(f"📌 Devoir ajouté : **{date_obj.strftime('%d-%m-%Y')}** en **{matière}** – {description}")
 
 @bot.command()
-async def ajouter(ctx, matière: str, date: str, *, description: str = None):
+async def calendrier(ctx):
+    data = charger_devoirs()
+
     try:
-        date_obj = datetime.strptime(date, "%d-%m-%Y")
-    except ValueError:
-        await ctx.send("❌ Format de date invalide. Utilise JJ-MM-AAAA.")
+        devoirs_triés = sorted(
+            data["devoirs"],
+            key=lambda d: datetime.strptime(d["date"], "%Y-%m-%d")
+        )
+    except Exception as e:
+        await ctx.send("❌ Erreur lors du tri des devoirs.")
         return
 
-    data = charger_devoirs()
-    data["devoirs"].append({
-        "matière": matière,
-        "date": date_obj.strftime("%Y-%m-%d"),  # format ISO
-        "description": description
-    })
+    if not devoirs_triés:
+        await ctx.send("📭 Aucun devoir enregistré.")
+        return
 
-    sauvegarder_devoirs(data)
-    await ctx.send(f"📌 Devoir ajouté : **{date_obj.strftime('%d-%m-%Y')}** en **{matière}** – {description}")
+    msg = "**📅 Voici les prochains devoirs :**\n"
+    for i, d in enumerate(devoirs_triés, start=1):
+        # Affichage en format JJ-MM-AAAA pour l’utilisateur
+        date_affichée = datetime.strptime(d["date"], "%Y-%m-%d").strftime("%d-%m-%Y")
+        msg += f"{i}. **{d['matière']}** le **{date_affichée}** : {d['description']}\n"
+
+    await ctx.send(msg)
 
 bot.run(os.getenv("TOKEN"))
