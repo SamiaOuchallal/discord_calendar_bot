@@ -48,6 +48,7 @@ async def ajouter(ctx, matière: str, date: str, *, description: str = None):
 @bot.command()
 async def calendrier(ctx):
     data = charger_devoirs()
+
     try:
         devoirs = sorted(
             data["devoirs"],
