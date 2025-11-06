@@ -50,7 +50,8 @@ async def ajouter(ctx, matière: str, date: str, *, description: str = None):
 async def calendrier(ctx):
     data = charger_devoirs()
     #devoirs = sorted(data["devoirs"], key=lambda d: d["date"])
-    devoirs = sorted(data["devoirs"], key=lambda date: datetime.strptime(d["date"], "%d-%m-%Y"))
+
+    devoirs = sorted(data["devoirs"], key=lambda date: datetime.strptime(data["date"], "%d-%m-%Y"))
 
     if not devoirs:
         await ctx.send("📭 Aucun devoir enregistré.")
