@@ -49,22 +49,31 @@ async def ajouter(ctx, matière: str, date: str, *, description: str = None):
 async def calendrier(ctx):
     data = charger_devoirs()
 
-    try:
-        devoirs_triés = sorted(
-            data["devoirs"],
-            key=lambda d: datetime.strptime(d["date"], "%d-%m-%Y")
-        )
-    except Exception as e:
-        await ctx.send("❌ Erreur lors du tri des devoirs.")
-        return
+    devoirs_valides = []
+    erreurs = []
+
+    # Conversion sécurisée des dates
+    for d in data["devoirs"]:
+        try:
+            d["date_obj"] = datetime.strptime(d["date"], "%d-%m-%Y")
+            devoirs_valides.append(d)
+        except ValueError:
+            erreurs.append(d)
+
+    # Tri par date réelle
+    devoirs_triés = sorted(devoirs_valides, key=lambda d: d["date_obj"])
 
     if not devoirs_triés:
-        await ctx.send("📭 Aucun devoir enregistré.")
+        await ctx.send("📭 Aucun devoir valide enregistré.")
         return
 
     msg = "**📅 Voici les prochains devoirs :**\n"
     for i, d in enumerate(devoirs_triés, start=1):
         msg += f"{i}. **{d['matière']}** le **{d['date']}** : {d['description']}\n"
+
+    if erreurs:
+        msg += f"\n⚠️ {len(erreurs)} devoir(s) ignoré(s) à cause d’un format de date invalide."
+
     await ctx.send(msg)
 
 bot.run(os.getenv("TOKEN"))
