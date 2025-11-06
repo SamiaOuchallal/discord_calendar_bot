@@ -50,17 +50,15 @@ async def calendrier(ctx):
     data = charger_devoirs()
 
     devoirs_valides = []
-    erreurs = []
-
-    # Conversion sécurisée des dates
     for d in data["devoirs"]:
         try:
+            # Conversion en datetime pour tri complet
             d["date_obj"] = datetime.strptime(d["date"], "%d-%m-%Y")
             devoirs_valides.append(d)
         except ValueError:
-            erreurs.append(d)
+            continue  # Ignore les dates invalides
 
-    # Tri par date réelle
+    # Tri par date_obj (jour + mois + année)
     devoirs_triés = sorted(devoirs_valides, key=lambda d: d["date_obj"])
 
     if not devoirs_triés:
@@ -70,9 +68,6 @@ async def calendrier(ctx):
     msg = "**📅 Voici les prochains devoirs :**\n"
     for i, d in enumerate(devoirs_triés, start=1):
         msg += f"{i}. **{d['matière']}** le **{d['date']}** : {d['description']}\n"
-
-    if erreurs:
-        msg += f"\n⚠️ {len(erreurs)} devoir(s) ignoré(s) à cause d’un format de date invalide."
 
     await ctx.send(msg)
 
