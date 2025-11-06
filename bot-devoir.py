@@ -43,7 +43,7 @@ async def ajouter(ctx, matière: str, date: str, *, description: str = None):
     })
 
     sauvegarder_devoirs(data)
-    await ctx.send(f"📌 Devoir ajouté : **{date_obj.strftime('%d-%m-%Y')}** en **{matière}** – {description}")
+    await ctx.send(f"📌 Devoir ajouté : **{date_obj}** en **{matière}** – {description}")
 
 @bot.command()
 async def calendrier(ctx):
